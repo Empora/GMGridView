@@ -32,6 +32,8 @@
 #import "GMGridViewLayoutStrategies.h"
 #import "UIGestureRecognizer+GMGridViewAdditions.h"
 
+#import "GMDynamicGridViewDataSource.h"
+
 static const NSUInteger kTagOffset = 50;
 static const CGFloat kDefaultAnimationDuration = 0.3;
 static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction;
@@ -122,6 +124,10 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
 
 // Rotation handling
 - (void)willRotate:(NSNotification *)notification;
+
+// Dynamic size additions
+- (CGSize)sizeForItemAtIndex:(NSInteger)index;
+- (CGRect)frameForItemAtIndex:(NSInteger)index;
 
 @end
 
@@ -614,9 +620,8 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     [_sortMovingItem removeFromSuperview];
     _sortMovingItem.frame = frameInScroll;
     [_scrollView addSubview:_sortMovingItem];
-    
-    CGPoint newOrigin = [self.layoutStrategy originForItemAtPosition:_sortFuturePosition];
-    CGRect newFrame = CGRectMake(newOrigin.x, newOrigin.y, _itemSize.width, _itemSize.height);
+
+    CGRect newFrame = [self frameForItemAtIndex:_sortFuturePosition];
     
     [UIView animateWithDuration:kDefaultAnimationDuration 
                           delay:0
@@ -699,13 +704,12 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
                         UIView *v = [self cellForItemAtIndex:position];
                                                 
                         v.tag = _sortFuturePosition + kTagOffset;
-                        CGPoint origin = [self.layoutStrategy originForItemAtPosition:_sortFuturePosition];
                         
                         [UIView animateWithDuration:kDefaultAnimationDuration 
                                               delay:0
                                             options:kDefaultAnimationOptions
                                          animations:^{
-                                             v.frame = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+                                             v.frame = [self frameForItemAtIndex:_sortFuturePosition];
                                          }
                                          completion:nil
                          ];
@@ -953,9 +957,8 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
             _transformingItem = nil;
             
             NSInteger position = [self positionForItemSubview:transformingView];
-            CGPoint origin = [self.layoutStrategy originForItemAtPosition:position];
             
-            CGRect finalFrameInScroll = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+            CGRect finalFrameInScroll = [self frameForItemAtIndex:position];
             CGRect finalFrameInSuperview = [_scrollView convertRect:finalFrameInScroll toView:self.mainSuperView];
             
             [transformingView switchToFullSizeMode:NO];
@@ -1020,8 +1023,8 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
 - (GMGridViewCell *)newItemSubViewForPosition:(NSInteger)position
 {
     GMGridViewCell *cell = [self.dataSource GMGridView:self cellForItemAtIndex:position];
-    CGPoint origin = [self.layoutStrategy originForItemAtPosition:position];
-    CGRect frame = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+
+    CGRect frame = [self frameForItemAtIndex:position];
     
     cell.frame = frame;
     cell.contentView.frame = cell.bounds;
@@ -1128,8 +1131,7 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
             if (view != _sortMovingItem && view != _transformingItem) 
             {
                 NSInteger index = view.tag - kTagOffset;
-                CGPoint origin = [self.layoutStrategy originForItemAtPosition:index];
-                CGRect newFrame = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+                CGRect newFrame = [self frameForItemAtIndex:index];
                 
                 // IF statement added for performance reasons (Time Profiling in instruments)
                 if (!CGRectEqualToRect(newFrame, view.frame)) 
@@ -1154,6 +1156,18 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     }
 }
 
+- (CGSize)sizeForItemAtIndex:(NSInteger)index{
+    if ([self.dataSource conformsToProtocol:@protocol(GMDynamicGridViewDataSource)]) {
+        return [(NSObject<GMDynamicGridViewDataSource>*)self.dataSource GMGridView:self sizeForItemAtIndex:index];
+    }
+    return _itemSize;
+}
+
+- (CGRect)frameForItemAtIndex:(NSInteger)index{
+    CGPoint origin = [self.layoutStrategy originForItemAtPosition:index];
+    CGSize size = [self sizeForItemAtIndex:index];
+    return CGRectMake(origin.x, origin.y, size.width, size.height);
+}
 
 //////////////////////////////////////////////////////////////
 #pragma mark loading/destroying items & reusing cells
@@ -1295,7 +1309,7 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     CGPoint newContentOffset = CGPointMake(MIN(_maxPossibleContentOffset.x, previousContentOffset.x), MIN(_maxPossibleContentOffset.y, previousContentOffset.y));
     newContentOffset = CGPointMake(MAX(newContentOffset.x, _minPossibleContentOffset.x), MAX(newContentOffset.y, _minPossibleContentOffset.y));
                                         
-    _scrollView.contentOffset = newContentOffset;
+//    _scrollView.contentOffset = newContentOffset;
     
     [self loadRequiredItems];
     
@@ -1310,8 +1324,8 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     UIView *currentView = [self cellForItemAtIndex:index];
     
     GMGridViewCell *cell = [self newItemSubViewForPosition:index];
-    CGPoint origin = [self.layoutStrategy originForItemAtPosition:index];
-    cell.frame = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+
+    cell.frame = [self frameForItemAtIndex:index];
     cell.alpha = 0;
     [_scrollView addSubview:cell];
     
@@ -1340,7 +1354,8 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     index = MIN(index, _numberTotalItems);
 
     CGPoint origin = [self.layoutStrategy originForItemAtPosition:index];
-    CGRect scrollToRect = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+
+    CGRect scrollToRect = [self frameForItemAtIndex:index];
     
     if (_scrollView.pagingEnabled) 
     {
@@ -1461,11 +1476,8 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     view1.tag = index2 + kTagOffset;
     view2.tag = index1 + kTagOffset;
 
-    CGPoint view1Origin = [self.layoutStrategy originForItemAtPosition:index2];
-    CGPoint view2Origin = [self.layoutStrategy originForItemAtPosition:index1];
-    
-    view1.frame = CGRectMake(view1Origin.x, view1Origin.y, _itemSize.width, _itemSize.height);
-    view2.frame = CGRectMake(view2Origin.x, view2Origin.y, _itemSize.width, _itemSize.height);
+    view1.frame = [self frameForItemAtIndex:index2];
+    view2.frame = [self frameForItemAtIndex:index1];
 
     
     CGRect visibleRect = CGRectMake(_scrollView.contentOffset.x,

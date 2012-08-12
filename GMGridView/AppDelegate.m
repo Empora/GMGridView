@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "Demo1ViewController.h"
 #import "Demo2ViewController.h"
+#import "Demo3ViewController.h"
 
 
 @implementation AppDelegate
@@ -23,6 +24,7 @@
     [tabBarController setViewControllers:[NSArray arrayWithObjects: 
                                           [[UINavigationController alloc] initWithRootViewController:[[Demo1ViewController alloc] init]],
                                           [[UINavigationController alloc] initWithRootViewController:[[Demo2ViewController alloc] init]],
+                                          [[UINavigationController alloc] initWithRootViewController:[[Demo3ViewController alloc] init]],
                                           nil]];
     
     self.window.rootViewController = tabBarController;

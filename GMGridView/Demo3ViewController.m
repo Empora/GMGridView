@@ -2,14 +2,18 @@
 //  ViewController.m
 //  GMGridView
 //
-//  Created by Gulam Moledina on 11-10-09.
+//  Created by Robert Biehl on 11.08.12.
 //  Copyright (c) 2011 GMoledina.ca. All rights reserved.
 //
 
 #import <QuartzCore/QuartzCore.h>
-#import "Demo1ViewController.h"
+#import "Demo3ViewController.h"
 #import "GMGridView.h"
 #import "OptionsViewController.h"
+
+#import "GMDynamicGridViewDataSource.h"
+#import "GMGridViewLayoutStrategies.h"
+#import "GMGridViewLayoutVerticalDynamicHeightStrategy.h"
 
 #define NUMBER_ITEMS_ON_LOAD 250
 
@@ -18,7 +22,7 @@
 #pragma mark ViewController (privates methods)
 //////////////////////////////////////////////////////////////
 
-@interface Demo1ViewController () <GMGridViewDataSource, GMGridViewSortingDelegate, GMGridViewTransformationDelegate, GMGridViewActionDelegate>
+@interface Demo3ViewController () <GMDynamicGridViewDataSource, GMGridViewSortingDelegate, GMGridViewTransformationDelegate, GMGridViewActionDelegate>
 {
     __gm_weak GMGridView *_gmGridView;
     UINavigationController *_optionsNav;
@@ -34,6 +38,8 @@
 - (void)presentOptions:(UIBarButtonItem *)barButton;
 - (void)optionsDoneAction;
 
+- (CGSize)GMGridView:(GMGridView *)gridView sizeForItemAtIndex:(NSInteger)index;
+
 @end
 
 
@@ -42,14 +48,14 @@
 #pragma mark ViewController implementation
 //////////////////////////////////////////////////////////////
 
-@implementation Demo1ViewController
+@implementation Demo3ViewController
 
 
 - (id)init
 {
-    if ((self =[super init])) 
+    if ((self =[super init]))
     {
-        self.title = @"Demo 1";
+        self.title = @"Demo 3";
         
         UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addMoreItem)];
         
@@ -79,7 +85,7 @@
         
         _data = [[NSMutableArray alloc] init];
         
-        for (int i = 0; i < NUMBER_ITEMS_ON_LOAD; i ++) 
+        for (int i = 0; i < NUMBER_ITEMS_ON_LOAD; i ++)
         {
             [_data addObject:[NSString stringWithFormat:@"%d", i]];
         }
@@ -93,7 +99,7 @@
 #pragma mark controller events
 //////////////////////////////////////////////////////////////
 
-- (void)loadView 
+- (void)loadView
 {
     [super loadView];
     self.view.backgroundColor = [UIColor whiteColor];
@@ -101,6 +107,11 @@
     NSInteger spacing = INTERFACE_IS_PHONE ? 10 : 15;
     
     GMGridView *gmGridView = [[GMGridView alloc] initWithFrame:self.view.bounds];
+    
+    GMGridViewLayoutVerticalDynamicHeightStrategy* strategy = (GMGridViewLayoutVerticalDynamicHeightStrategy*)[GMGridViewLayoutStrategyFactory strategyFromType:GMGridViewLayoutVerticalDynamicHeight];
+    strategy.dynamicHeightDataSource = self;
+    gmGridView.layoutStrategy = strategy;
+    
     gmGridView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     gmGridView.backgroundColor = [UIColor clearColor];
     [self.view addSubview:gmGridView];
@@ -116,8 +127,8 @@
     _gmGridView.dataSource = self;
     
     UIButton *infoButton = [UIButton buttonWithType:UIButtonTypeInfoDark];
-    infoButton.frame = CGRectMake(self.view.bounds.size.width - 40, 
-                                  self.view.bounds.size.height - 40, 
+    infoButton.frame = CGRectMake(self.view.bounds.size.width - 40,
+                                  self.view.bounds.size.height - 40,
                                   40,
                                   40);
     infoButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin;
@@ -161,11 +172,26 @@
 #pragma mark orientation management
 //////////////////////////////////////////////////////////////
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation 
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return YES;
 }
 
+
+//////////////////////////////////////////////////////////////
+#pragma mark GMDynamicGridViewDataSource
+//////////////////////////////////////////////////////////////
+
+- (CGSize)GMGridView:(GMGridView *)gridView sizeForItemAtIndex:(NSInteger)index{
+    int r = index%5;
+    if (r==1) {
+        return CGSizeMake(230, 51);
+    } else if(r==2){
+        return CGSizeMake(230, 124);
+    } else {
+        return CGSizeMake(230, 409);
+    }
+}
 
 //////////////////////////////////////////////////////////////
 #pragma mark GMGridViewDataSource
@@ -178,19 +204,13 @@
 
 - (CGSize)sizeForItemsInGMGridView:(GMGridView *)gridView
 {
-    if (INTERFACE_IS_PHONE) 
+    if (INTERFACE_IS_PHONE)
     {
         return CGSizeMake(140, 110);
     }
     else
     {
-        int r = arc4random()%2;
-        if (r) {
-            return CGSizeMake(230, 175);
-        } else {
-            return CGSizeMake(230, 230);
-        }
-        
+        return CGSizeMake(230, 175);
     }
 }
 
@@ -198,11 +218,11 @@
 {
     //NSLog(@"Creating view indx %d", index);
     
-    CGSize size = [self sizeForItemsInGMGridView:gridView];
+    CGSize size = [self GMGridView:gridView sizeForItemAtIndex:index];
     
     GMGridViewCell *cell = [gridView dequeueReusableCell];
     
-    if (!cell) 
+    if (!cell)
     {
         cell = [[GMGridViewCell alloc] init];
         cell.deleteButtonIcon = [UIImage imageNamed:@"close_x.png"];
@@ -218,6 +238,8 @@
         view.layer.shadowRadius = 8;
         
         cell.contentView = view;
+    } else {
+        cell.frame = CGRectMake(0, 0, size.width, size.height);
     }
     
     [[cell.contentView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
@@ -256,23 +278,23 @@
 
 - (void)GMGridView:(GMGridView *)gridView didStartMovingCell:(GMGridViewCell *)cell
 {
-    [UIView animateWithDuration:0.3 
-                          delay:0 
-                        options:UIViewAnimationOptionAllowUserInteraction 
+    [UIView animateWithDuration:0.3
+                          delay:0
+                        options:UIViewAnimationOptionAllowUserInteraction
                      animations:^{
                          cell.contentView.backgroundColor = [UIColor orangeColor];
                          cell.contentView.layer.shadowOpacity = 0.7;
-                     } 
+                     }
                      completion:nil
      ];
 }
 
 - (void)GMGridView:(GMGridView *)gridView didEndMovingCell:(GMGridViewCell *)cell
 {
-    [UIView animateWithDuration:0.3 
-                          delay:0 
-                        options:UIViewAnimationOptionAllowUserInteraction 
-                     animations:^{  
+    [UIView animateWithDuration:0.3
+                          delay:0
+                        options:UIViewAnimationOptionAllowUserInteraction
+                     animations:^{
                          cell.contentView.backgroundColor = [UIColor redColor];
                          cell.contentView.layer.shadowOpacity = 0;
                      }
@@ -304,7 +326,7 @@
 
 - (CGSize)GMGridView:(GMGridView *)gridView sizeInFullSizeForCell:(GMGridViewCell *)cell atIndex:(NSInteger)index
 {
-    if (INTERFACE_IS_PHONE) 
+    if (INTERFACE_IS_PHONE)
     {
         return CGSizeMake(310, 310);
     }
@@ -330,7 +352,7 @@
     label.backgroundColor = [UIColor clearColor];
     label.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
-    if (INTERFACE_IS_PHONE) 
+    if (INTERFACE_IS_PHONE)
     {
         label.font = [UIFont boldSystemFontOfSize:15];
     }
@@ -347,25 +369,25 @@
 
 - (void)GMGridView:(GMGridView *)gridView didStartTransformingCell:(GMGridViewCell *)cell
 {
-    [UIView animateWithDuration:0.5 
-                          delay:0 
-                        options:UIViewAnimationOptionAllowUserInteraction 
+    [UIView animateWithDuration:0.5
+                          delay:0
+                        options:UIViewAnimationOptionAllowUserInteraction
                      animations:^{
                          cell.contentView.backgroundColor = [UIColor blueColor];
                          cell.contentView.layer.shadowOpacity = 0.7;
-                     } 
+                     }
                      completion:nil];
 }
 
 - (void)GMGridView:(GMGridView *)gridView didEndTransformingCell:(GMGridViewCell *)cell
 {
-    [UIView animateWithDuration:0.5 
-                          delay:0 
-                        options:UIViewAnimationOptionAllowUserInteraction 
+    [UIView animateWithDuration:0.5
+                          delay:0
+                        options:UIViewAnimationOptionAllowUserInteraction
                      animations:^{
                          cell.contentView.backgroundColor = [UIColor redColor];
                          cell.contentView.layer.shadowOpacity = 0;
-                     } 
+                     }
                      completion:nil];
 }
 
@@ -391,7 +413,7 @@
 - (void)removeItem
 {
     // Example: removing last item
-    if ([_data count] > 0) 
+    if ([_data count] > 0)
     {
         NSInteger index = [_data count] - 1;
         
@@ -403,7 +425,7 @@
 - (void)refreshItem
 {
     // Example: reloading last item
-    if ([_data count] > 0) 
+    if ([_data count] > 0)
     {
         int index = [_data count] - 1;
         
@@ -418,10 +440,10 @@
 {
     NSString *info = @"Long-press an item and its color will change; letting you know that you can now move it around. \n\nUsing two fingers, pinch/drag/rotate an item; zoom it enough and you will enter the fullsize mode";
     
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Info" 
-                                                        message:info 
-                                                       delegate:nil 
-                                              cancelButtonTitle:@"OK" 
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Info"
+                                                        message:info
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil];
     
     [alertView show];

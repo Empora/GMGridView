@@ -28,6 +28,8 @@
 
 #import "GMGridViewLayoutStrategies.h"
 
+#import "GMGridViewLayoutVerticalDynamicHeightStrategy.h"
+
 //////////////////////////////////////////////////////////////
 #pragma mark - 
 #pragma mark - Factory implementation
@@ -51,6 +53,9 @@
             break;
         case GMGridViewLayoutHorizontalPagedTTB:
             strategy = [[GMGridViewLayoutHorizontalPagedTTBStrategy alloc] init];
+            break;
+        case GMGridViewLayoutVerticalDynamicHeight:
+            strategy = [[GMGridViewLayoutVerticalDynamicHeightStrategy alloc] init];
             break;
     }
     
