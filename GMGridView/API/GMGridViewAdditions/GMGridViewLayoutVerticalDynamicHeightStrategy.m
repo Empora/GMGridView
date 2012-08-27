@@ -44,6 +44,7 @@
     }
 
     _maxItemHeight = 0.0;
+    _maxContentHeight = 0.0;
     
     CGRect actualBounds = CGRectMake(0,
                                      0,
@@ -56,10 +57,37 @@
     }
     
     CGPoint lastOrigin = [self originForItemAtPosition:count-1];
-    CGSize lastSize = [self.dynamicHeightDataSource GMGridView:nil sizeForItemAtIndex:count-1];
-    CGSize actualContentSize = CGSizeMake(ceil(MIN(self.itemCount, self.numberOfColumns) * (self.itemSize.width + self.itemSpacing)) - self.itemSpacing, lastOrigin.y+lastSize.height);
+//    CGSize actualContentSize = CGSizeMake(ceil(MIN(self.itemCount, self.numberOfColumns) * (self.itemSize.width + self.itemSpacing)) - self.itemSpacing, lastOrigin.y+lastSize.height);
+    
+    CGSize actualContentSize = CGSizeMake(ceil(MIN(self.itemCount, self.numberOfColumns) * (self.itemSize.width + self.itemSpacing)) - self.itemSpacing, _maxContentHeight);
     
     [self setEdgeAndContentSizeFromAbsoluteContentSize:actualContentSize];
+}
+
+- (void)setEdgeAndContentSizeFromAbsoluteContentSize:(CGSize)actualContentSize
+{
+    if (self.centeredGrid)
+    {
+        NSInteger widthSpace, heightSpace;
+        NSInteger top, left, bottom, right;
+        
+        widthSpace  = floor((self.gridBounds.size.width  - actualContentSize.width)  / 2.0);
+        heightSpace = 0.0;
+        
+        left   = MAX(widthSpace,  self.minEdgeInsets.left);
+        right  = MAX(widthSpace,  self.minEdgeInsets.right);
+        top    = MAX(heightSpace, self.minEdgeInsets.top);
+        bottom = MAX(heightSpace, self.minEdgeInsets.bottom);
+        
+        _edgeInsets = UIEdgeInsetsMake(top, left, bottom, right);
+    }
+    else
+    {
+        _edgeInsets = self.minEdgeInsets;
+    }
+    
+    _contentSize = CGSizeMake(actualContentSize.width  + self.edgeInsets.left + self.edgeInsets.right,
+                              actualContentSize.height + self.edgeInsets.top  + self.edgeInsets.bottom);
 }
 
 - (CGPoint)originForItemAtPosition:(NSInteger)position{
@@ -85,12 +113,16 @@
             
             NSInteger currentColumn = 0;
             CGSize curSize;
-            for (NSInteger i = 0; i <= index; i++) {
+            for (NSInteger i = 0; i < index; i++) {
                 _yOriginCache[i] = columns[currentColumn] + topEdgeInsets;
                 
                 curSize = [self.dynamicHeightDataSource GMGridView:nil sizeForItemAtIndex:i];
                 if (curSize.height >_maxItemHeight) {
                     _maxItemHeight = curSize.height;
+                }
+                
+                if ((_yOriginCache[i] + curSize.height) > _maxContentHeight) {
+                    _maxContentHeight = (_yOriginCache[i] + curSize.height);
                 }
                 
                 columns[currentColumn] = columns[currentColumn]+curSize.height+itemSpacing;

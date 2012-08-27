@@ -73,11 +73,11 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     CGPoint _maxPossibleContentOffset;
     
     // Transforming control vars
-    GMGridViewCell *_transformingItem;
+/*    GMGridViewCell *_transformingItem;
     CGFloat _lastRotation;
     CGFloat _lastScale;
     BOOL _inFullSizeMode;
-    BOOL _rotationActive;
+    BOOL _rotationActive;*/
 }
 
 @property (nonatomic, readonly) BOOL itemsSubviewsCacheIsValid;
@@ -1102,6 +1102,7 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
 
 - (void)recomputeSize
 {
+//    NSLog(@"GMGridView: recomputeSize");
     [self.layoutStrategy setupItemSize:_itemSize andItemSpacing:self.itemSpacing withMinEdgeInsets:self.minEdgeInsets andCenteredGrid:self.centerGrid];
     [self.layoutStrategy rebaseWithItemCount:_numberTotalItems insideOfBounds:self.bounds];
     
@@ -1175,12 +1176,15 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
 
 - (void)loadRequiredItems
 {
+//    NSLog(@"GMGridView: loadRequiredItems [start]");
+//    NSLog(@"GMGridView: loadRequiredItems [rangeOfPositions]");
     NSRange rangeOfPositions = [self.layoutStrategy rangeOfPositionsInBoundsFromOffset: _scrollView.contentOffset];
     NSRange loadedPositionsRange = NSMakeRange(self.firstPositionLoaded, self.lastPositionLoaded - self.firstPositionLoaded);
     
     BOOL forceLoad = self.firstPositionLoaded == GMGV_INVALID_POSITION || self.lastPositionLoaded == GMGV_INVALID_POSITION;
 
     NSInteger positionToLoad;
+//    NSLog(@"GMGridView: loadRequiredItems [for %@]", NSStringFromRange(rangeOfPositions));
     
     for (int i = 0; i < rangeOfPositions.length; i++) 
     {
@@ -1200,8 +1204,9 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     self.lastPositionLoaded  = self.lastPositionLoaded == GMGV_INVALID_POSITION ? NSMaxRange(rangeOfPositions) : MAX(self.lastPositionLoaded, rangeOfPositions.length + rangeOfPositions.location);
     
     [self setSubviewsCacheAsInvalid];
-    
+//    NSLog(@"GMGridView: loadRequiredItems [cleanupUnseenItems]");
     [self cleanupUnseenItems];
+//    NSLog(@"GMGridView: loadRequiredItems [end]");
 }
 
 
@@ -1289,31 +1294,27 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
 
 - (void)reloadData
 {
-    CGPoint previousContentOffset = _scrollView.contentOffset;
+//    CGPoint previousContentOffset = _scrollView.contentOffset;
     
-    [[self itemSubviews] enumerateObjectsUsingBlock:^(id obj, NSUInteger index, BOOL *stop){
+/*    [[self itemSubviews] enumerateObjectsUsingBlock:^(id obj, NSUInteger index, BOOL *stop){
         [(UIView *)obj removeFromSuperview];
-    }];
+    }];*/
     
     self.firstPositionLoaded = GMGV_INVALID_POSITION;
     self.lastPositionLoaded  = GMGV_INVALID_POSITION;
     
-    [self setSubviewsCacheAsInvalid];
+//    [self setSubviewsCacheAsInvalid];
     
     NSUInteger numberItems = [self.dataSource numberOfItemsInGMGridView:self];    
     _itemSize = [self.dataSource sizeForItemsInGMGridView:self];
     _numberTotalItems = numberItems;
-    
-    [self recomputeSize];
-    
-    CGPoint newContentOffset = CGPointMake(MIN(_maxPossibleContentOffset.x, previousContentOffset.x), MIN(_maxPossibleContentOffset.y, previousContentOffset.y));
-    newContentOffset = CGPointMake(MAX(newContentOffset.x, _minPossibleContentOffset.x), MAX(newContentOffset.y, _minPossibleContentOffset.y));
-                                        
+//    NSLog(@"GMGridView: reloadData");
+//    CGPoint newContentOffset = CGPointMake(MIN(_maxPossibleContentOffset.x, previousContentOffset.x), MIN(_maxPossibleContentOffset.y, previousContentOffset.y));
+//    newContentOffset = CGPointMake(MAX(newContentOffset.x, _minPossibleContentOffset.x), MAX(newContentOffset.y, _minPossibleContentOffset.y));
+//                                        
 //    _scrollView.contentOffset = newContentOffset;
     
-    [self loadRequiredItems];
-    
-    [self setSubviewsCacheAsInvalid];
+//    [self setSubviewsCacheAsInvalid];
     [self setNeedsLayout];
 }
 

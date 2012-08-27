@@ -60,7 +60,12 @@ typedef enum
 
 @interface GMGridView : UIView
 {
-    
+    // Transforming control vars
+    GMGridViewCell *_transformingItem;
+    CGFloat _lastRotation;
+    CGFloat _lastScale;
+    BOOL _inFullSizeMode;
+    BOOL _rotationActive;
 }
 
 // Delegates

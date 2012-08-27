@@ -29,6 +29,7 @@
 #import "GMGridViewLayoutStrategies.h"
 
 #import "GMGridViewLayoutVerticalDynamicHeightStrategy.h"
+#import "GMGridViewLayoutTopLeftVerticalStrategy.h"
 
 //////////////////////////////////////////////////////////////
 #pragma mark - 
@@ -56,6 +57,9 @@
             break;
         case GMGridViewLayoutVerticalDynamicHeight:
             strategy = [[GMGridViewLayoutVerticalDynamicHeightStrategy alloc] init];
+            break;
+        case GMGridViewLayoutTopLeftVertical:
+            strategy = [[GMGridViewLayoutTopLeftVerticalStrategy alloc] init];
             break;
     }
     

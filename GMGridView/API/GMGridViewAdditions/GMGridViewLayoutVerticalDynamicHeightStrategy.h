@@ -15,6 +15,7 @@
     
     NSInteger _numberOfColumns;
     
+    float _maxContentHeight;
     float* _yOriginCache;
     float _maxItemHeight;
 }
