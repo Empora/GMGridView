@@ -10,7 +10,8 @@
 
 @implementation GMGridViewLayoutVerticalDynamicHeightStrategy
 
-@synthesize dynamicHeightDataSource = _dataSource, numberOfColumns = _numberOfColumns;
+@synthesize dynamicHeightDataSource = _dataSource;
+@synthesize numberOfColumns = _numberOfColumns;
 
 + (BOOL)requiresEnablingPaging{
     return NO;
@@ -113,7 +114,7 @@
             
             NSInteger currentColumn = 0;
             CGSize curSize;
-            for (NSInteger i = 0; i < index; i++) {
+            for (NSInteger i = 0; i <= index; i++) {
                 _yOriginCache[i] = columns[currentColumn] + topEdgeInsets;
                 
                 curSize = [self.dynamicHeightDataSource GMGridView:nil sizeForItemAtIndex:i];
@@ -249,7 +250,7 @@
 //    NSInteger firstPosition = firstRow * self.numberOfColumns;
 //    NSInteger lastPosition  = ((lastRow + 1) * self.numberOfColumns);
     
-    return NSMakeRange(firstPosition, (lastPosition - firstPosition));
+    return NSMakeRange(firstPosition, (lastPosition - firstPosition+1));
 }
 
 

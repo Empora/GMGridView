@@ -11,7 +11,7 @@
 #import "GMDynamicGridViewDataSource.h"
 
 @interface GMGridViewLayoutVerticalDynamicHeightStrategy : GMGridViewLayoutStrategyBase<GMGridViewLayoutStrategy>{
-    NSObject<GMDynamicGridViewDataSource>* __unsafe_unretained _dataSource;
+    __unsafe_unretained NSObject<GMDynamicGridViewDataSource>* _dataSource;
     
     NSInteger _numberOfColumns;
     

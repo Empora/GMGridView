@@ -174,7 +174,7 @@
                          self.deleteButton.alpha = editing ? 1 : 0;
                      } 
                      completion:nil];
-    
+
     [self shakeStatus:editing];
 }
 

@@ -41,6 +41,7 @@
 
 - (void)shakeStatus:(BOOL)enabled
 {
+    /*
     if (enabled) 
     {
         CGFloat rotation = 0.03;
@@ -59,6 +60,7 @@
     {
         [self.layer removeAnimationForKey:@"shakeAnimation"];
     }
+     */
 }
 
 @end

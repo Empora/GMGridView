@@ -254,6 +254,12 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     return self;
 }
 
+- (void) removeFromSuperview{
+    [super removeFromSuperview];
+    
+    // Fixes memory leak
+    self.itemSubviewsCache = nil;
+}
 
 - (void)dealloc
 {
@@ -1291,14 +1297,14 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
 //////////////////////////////////////////////////////////////
 #pragma mark public methods
 //////////////////////////////////////////////////////////////
-
+/*
 - (void)reloadData
 {
 //    CGPoint previousContentOffset = _scrollView.contentOffset;
     
-/*    [[self itemSubviews] enumerateObjectsUsingBlock:^(id obj, NSUInteger index, BOOL *stop){
-        [(UIView *)obj removeFromSuperview];
-    }];*/
+//[[self itemSubviews] enumerateObjectsUsingBlock:^(id obj, NSUInteger index, BOOL *stop){
+//        [(UIView *)obj removeFromSuperview];
+//    }];
     
     self.firstPositionLoaded = GMGV_INVALID_POSITION;
     self.lastPositionLoaded  = GMGV_INVALID_POSITION;
@@ -1315,6 +1321,34 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
 //    _scrollView.contentOffset = newContentOffset;
     
 //    [self setSubviewsCacheAsInvalid];
+    [self setNeedsLayout];
+}
+*/
+
+- (void)reloadData
+{
+    //CGPoint previousContentOffset = _scrollView.contentOffset;
+    
+    [[self itemSubviews] enumerateObjectsUsingBlock:^(id obj, NSUInteger index, BOOL *stop){
+            [(UIView *)obj removeFromSuperview];
+    }];
+    
+    self.firstPositionLoaded = GMGV_INVALID_POSITION;
+    self.lastPositionLoaded  = GMGV_INVALID_POSITION;
+    
+    [self setSubviewsCacheAsInvalid];
+    
+    NSUInteger numberItems = [self.dataSource numberOfItemsInGMGridView:self];
+    _itemSize = [self.dataSource sizeForItemsInGMGridView:self];
+    _numberTotalItems = numberItems;
+    
+    
+    //    CGPoint newContentOffset = CGPointMake(MIN(_maxPossibleContentOffset.x, previousContentOffset.x), MIN(_maxPossibleContentOffset.y, previousContentOffset.y));
+    //    newContentOffset = CGPointMake(MAX(newContentOffset.x, _minPossibleContentOffset.x), MAX(newContentOffset.y, _minPossibleContentOffset.y));
+    //
+    //    _scrollView.contentOffset = newContentOffset;
+    
+    [self setSubviewsCacheAsInvalid];
     [self setNeedsLayout];
 }
 

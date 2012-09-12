@@ -24,6 +24,8 @@
 		16A0D030145342F8004D7BBC /* GMGridViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 16A0D02F145342F8004D7BBC /* GMGridViewCell.m */; };
 		16DF1A6E145E3456006AA43C /* GMGridViewLayoutStrategies.m in Sources */ = {isa = PBXBuildFile; fileRef = 16DF1A6D145E3456006AA43C /* GMGridViewLayoutStrategies.m */; };
 		16DF1A71145E3461006AA43C /* UIGestureRecognizer+GMGridViewAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 16DF1A70145E3460006AA43C /* UIGestureRecognizer+GMGridViewAdditions.m */; };
+		E12D446C15F5FD3900F6E2A0 /* GMGridViewLayoutTopLeftVerticalStrategy.m in Sources */ = {isa = PBXBuildFile; fileRef = E12D446915F5FD3900F6E2A0 /* GMGridViewLayoutTopLeftVerticalStrategy.m */; };
+		E12D446D15F5FD3900F6E2A0 /* GMGridViewLayoutVerticalDynamicHeightStrategy.m in Sources */ = {isa = PBXBuildFile; fileRef = E12D446B15F5FD3900F6E2A0 /* GMGridViewLayoutVerticalDynamicHeightStrategy.m */; };
 		E16D95BA15D5C12E0050616D /* Demo3ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E16D95B915D5C12E0050616D /* Demo3ViewController.m */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +60,11 @@
 		16DF1A6D145E3456006AA43C /* GMGridViewLayoutStrategies.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GMGridViewLayoutStrategies.m; path = GMGridView/API/GMGridViewLayoutStrategies.m; sourceTree = SOURCE_ROOT; };
 		16DF1A6F145E3460006AA43C /* UIGestureRecognizer+GMGridViewAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIGestureRecognizer+GMGridViewAdditions.h"; path = "GMGridView/API/UIGestureRecognizer+GMGridViewAdditions.h"; sourceTree = SOURCE_ROOT; };
 		16DF1A70145E3460006AA43C /* UIGestureRecognizer+GMGridViewAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIGestureRecognizer+GMGridViewAdditions.m"; path = "GMGridView/API/UIGestureRecognizer+GMGridViewAdditions.m"; sourceTree = SOURCE_ROOT; };
+		E12D446715F5FD3900F6E2A0 /* GMDynamicGridViewDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GMDynamicGridViewDataSource.h; sourceTree = "<group>"; };
+		E12D446815F5FD3900F6E2A0 /* GMGridViewLayoutTopLeftVerticalStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GMGridViewLayoutTopLeftVerticalStrategy.h; sourceTree = "<group>"; };
+		E12D446915F5FD3900F6E2A0 /* GMGridViewLayoutTopLeftVerticalStrategy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GMGridViewLayoutTopLeftVerticalStrategy.m; sourceTree = "<group>"; };
+		E12D446A15F5FD3900F6E2A0 /* GMGridViewLayoutVerticalDynamicHeightStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GMGridViewLayoutVerticalDynamicHeightStrategy.h; sourceTree = "<group>"; };
+		E12D446B15F5FD3900F6E2A0 /* GMGridViewLayoutVerticalDynamicHeightStrategy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GMGridViewLayoutVerticalDynamicHeightStrategy.m; sourceTree = "<group>"; };
 		E13DCA3315D68C480080071B /* GMGridViewlib-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GMGridViewlib-Prefix.pch"; sourceTree = "<group>"; };
 		E13DCA3415D68C480080071B /* GMGridViewlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GMGridViewlib.h; sourceTree = "<group>"; };
 		E13DCA3615D68C480080071B /* GMGridViewlib.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GMGridViewlib.m; sourceTree = "<group>"; };
@@ -157,6 +164,7 @@
 		16924B361442CA9400E6E556 /* API */ = {
 			isa = PBXGroup;
 			children = (
+				E12D446615F5FD3900F6E2A0 /* GMGridViewAdditions */,
 				1691D7AC1442D02C00F472BF /* GMGridView.h */,
 				16A0D02E145342F8004D7BBC /* GMGridViewCell.h */,
 				16961E1C1470A61C00DA708A /* Implementation Logic */,
@@ -189,6 +197,19 @@
 			);
 			name = "Implementation Logic";
 			sourceTree = "<group>";
+		};
+		E12D446615F5FD3900F6E2A0 /* GMGridViewAdditions */ = {
+			isa = PBXGroup;
+			children = (
+				E12D446715F5FD3900F6E2A0 /* GMDynamicGridViewDataSource.h */,
+				E12D446815F5FD3900F6E2A0 /* GMGridViewLayoutTopLeftVerticalStrategy.h */,
+				E12D446915F5FD3900F6E2A0 /* GMGridViewLayoutTopLeftVerticalStrategy.m */,
+				E12D446A15F5FD3900F6E2A0 /* GMGridViewLayoutVerticalDynamicHeightStrategy.h */,
+				E12D446B15F5FD3900F6E2A0 /* GMGridViewLayoutVerticalDynamicHeightStrategy.m */,
+			);
+			name = GMGridViewAdditions;
+			path = GMGridView/API/GMGridViewAdditions;
+			sourceTree = SOURCE_ROOT;
 		};
 		E13DCA3115D68C480080071B /* GMGridViewlib */ = {
 			isa = PBXGroup;
@@ -301,6 +322,8 @@
 				169AE3781460E1B300C0CBCD /* OptionsViewController.m in Sources */,
 				16583C24146CC2290006F11B /* Demo2ViewController.m in Sources */,
 				E16D95BA15D5C12E0050616D /* Demo3ViewController.m in Sources */,
+				E12D446C15F5FD3900F6E2A0 /* GMGridViewLayoutTopLeftVerticalStrategy.m in Sources */,
+				E12D446D15F5FD3900F6E2A0 /* GMGridViewLayoutVerticalDynamicHeightStrategy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
